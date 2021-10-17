@@ -41,15 +41,23 @@ function App() {
 
   const testAPI = async () => {
     try {
-      const r = await fetch(
-        `http://192.168.1.135:5000/testing?Lat=${latitude}&long=${latitude}&start=${start}&end=${end}`
+      const r1 = await fetch(
+        `http://192.168.1.135:5000/testing?lat=${latitude}&long=${latitude}&end=${end}`
       );
-      const response = await r.json();
-      setImage1(response.image1);
-      setImage2(response.image2);
+      const response1 = await rq.json();
+      const r2 = await fetch(
+        `http://192.168.1.135:5000/get_temperature?lat=${latitude}&long=${latitude}&end=${end}`
+      );
+      const response2 = await r2.json();
+      const r3 = await fetch(
+        `http://192.168.1.135:5000/get_temperature?lat=${latitude}&long=${latitude}&end=${end}`
+      );
+      const response3 = await r2.json();
+      setImage1(response1.image);
+      setImage2(response2.image);
       //setImage3(response.image3);
       setShow(1);
-      console.log(response);
+      console.log(response1);
     } catch (e) {
       console.error(e);
     }

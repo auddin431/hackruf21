@@ -22,12 +22,6 @@ def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
 
-rcParams['figure.figsize'] = 18, 8
-
-matplotlib.rcParams['axes.labelsize'] = 14
-matplotlib.rcParams['xtick.labelsize'] = 12
-matplotlib.rcParams['ytick.labelsize'] = 12
-matplotlib.rcParams['text.color'] = 'k'
 
 
 
