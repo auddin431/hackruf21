@@ -39,20 +39,17 @@ function App() {
   //const [image3, setImage3] = useState("");
   const [end, setEnd] = useState(2022);
 
-  const testAPI = async () => {
+  const testAPI = async (lll) => {
     try {
       const r1 = await fetch(
-        `http://192.168.1.135:5000/testing?lat=${latitude}&long=${latitude}&end=${end}`
+        `http://172.31.2.106:5000/get_precipitation?lat=${lll.lat}&long=${lll.lng}&end=${end}`
       );
-      const response1 = await rq.json();
+      const response1 = await r1.json();
       const r2 = await fetch(
-        `http://192.168.1.135:5000/get_temperature?lat=${latitude}&long=${latitude}&end=${end}`
+        `http://172.31.2.106:5000/get_air_quality?lat=${lll.lat}&long=${lll.lng}&end=${end}`
       );
       const response2 = await r2.json();
-      const r3 = await fetch(
-        `http://192.168.1.135:5000/get_temperature?lat=${latitude}&long=${latitude}&end=${end}`
-      );
-      const response3 = await r2.json();
+
       setImage1(response1.image);
       setImage2(response2.image);
       //setImage3(response.image3);
@@ -68,8 +65,16 @@ function App() {
     const getLL = await getLatLng(geoByAddy[0]);
     setLatitude(getLL.lat);
     setLongitude(getLL.lng);
-    setShow(1);
+    return getLL;
   };
+
+  function resolveAfter2Seconds(x) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(x);
+    }, 2000);
+  });
+}
 
   const changeLocation = (e) => {
     setLocation(e.target.value);
@@ -86,10 +91,10 @@ function App() {
     //console.log(e.target.value);
   };
 
-  const test = () => {
+  const test = async () => {
     console.log(location.label);
-    getLatLong();
-    testAPI();
+    var lll = await getLatLong();
+    testAPI(lll);
     //setShow(1);
   };
 
