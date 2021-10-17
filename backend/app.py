@@ -35,8 +35,8 @@ def get_time_series(dataset_name, band, latLng):
         ys.append(float(features[x]["properties"][band]))
     return ys
 
-def make_graph(ys, startyear, endyear, title):    
-    series = pd.Series(ys, pd.date_range(start="1979-01-01", end="2020-07-01", freq='M'))
+def make_graph(ys, dataset_start, dataset_end, startyear, endyear, title, image_name):    
+    series = pd.Series(ys, pd.date_range(start=dataset_start, end=dataset_end, freq="infer"))
     p = d = q = range(0, 2)
 
     mi = float('inf')
@@ -88,29 +88,73 @@ def make_graph(ys, startyear, endyear, title):
     ax.set_ylabel(title)
 
     plt.legend()
-    plt.savefig('test.png')
+    plt.savefig(image_name)
+    plt.figure().clear()
 
 
 app = Flask(__name__)
 app.config['CORS_HEADERS'] = 'Content-Type'
 #cors = CORS(app, resources={r"/testing": {"origins": "http://192.1.1.109:3000"}})
-cors = CORS(app, resources={r"/imagetest": {"origins": "http://192.1.1.109:3000"}})
+cors = CORS(app, resources={r"/imagetest": {"origins": "http://192.168.1.135:3000"}})
 
 ee.Initialize()
 
+rcParams['figure.figsize'] = 18, 8
+
+matplotlib.rcParams['axes.labelsize'] = 14
+matplotlib.rcParams['xtick.labelsize'] = 12
+matplotlib.rcParams['ytick.labelsize'] = 12
+matplotlib.rcParams['text.color'] = 'k'
+matplotlib.use('agg')
+
 
 @app.route("/get_precipitation", methods=['GET'])
-@cross_origin(origin='192.1.1.109',headers=['Content- Type','Authorization'])
-def testing_send():
+@cross_origin(origin='192.168.1.135',headers=['Content- Type','Authorization'])
+def get_precipitation():
+    ys = get_time_series("ECMWF/ERA5/MONTHLY", "total_precipitation", [float(request.args.get("lat")), float(request.args.get("long"))])
 
-    ys = get_time_series("ECMWF/ERA5/MONTHLY", "mean_2m_air_temperature", [0, 0])
-    make_graph(ys, 2000, 2030, "precipitation (m)")
+    make_graph(ys, "1979-01-01", "2016-07-01", 2000, int(request.args.get("end")), "precipitation (m)", "precipitation.png")
 
-    with open("test.png", "rb") as img_file:
+    with open("precipitation.png", "rb") as img_file:
         my_string = str(base64.b64encode(img_file.read()))
         my_string = my_string[2:len(my_string)-1]
 
-    returnthing = {"image1": my_string}
+    returnthing = {"image": my_string}
 
     return jsonify(returnthing)
 
+
+def kelvin_to_fahrenheit(k):
+    return (k-273.15) * 9 / 5.0 + 32
+
+@app.route("/get_temperature", methods=['GET'])
+@cross_origin(origin='192.168.1.135',headers=['Content- Type','Authorization'])
+def get_temperature():
+    ys = get_time_series("ECMWF/ERA5/MONTHLY", "mean_2m_air_temperature", [float(request.args.get("lat")), float(request.args.get("long"))])
+
+    ys = map(kelvin_to_fahrenheit, ys)
+
+    make_graph(ys, "1979-01-01", "2016-07-01", 2000, int(request.args.get("end")), "Temperature (F)", "temperature.png")
+
+    with open("temperature.png", "rb") as img_file:
+        my_string = str(base64.b64encode(img_file.read()))
+        my_string = my_string[2:len(my_string)-1]
+
+    returnthing = {"image": my_string}
+
+    return jsonify(returnthing)
+
+@app.route("/get_air_quality", methods=['GET'])
+@cross_origin(origin='192.168.1.135',headers=['Content- Type','Authorization'])
+def get_air_quality():
+    ys = get_time_series("COPERNICUS/S5P/OFFL/L3_NO2", "NO2_column_number_density", [float(request.args.get("lat")), float(request.args.get("long"))])
+
+    make_graph(ys, "2018-06-28", "2021-10-07", 2018, int(request.args.get("end")), "air quality (mol/m^2)", "air_quality.png")
+
+    with open("air_quality.png", "rb") as img_file:
+        my_string = str(base64.b64encode(img_file.read()))
+        my_string = my_string[2:len(my_string)-1]
+
+    returnthing = {"image": my_string}
+
+    return jsonify(returnthing)
