@@ -10,10 +10,6 @@ import { geocodeByAddress, getLatLng } from "react-google-places-autocomplete";
 
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 
-const MapComponent = () => {
-  return <GooglePlacesAutocomplete apiKey={process.env.REACT_APP_GMAP_KEY} />;
-};
-
 function TestComponent(props) {
   return (
     <>
@@ -100,19 +96,13 @@ function App() {
               <Form.Group className="mb-3">
                 <Form.Label>Location</Form.Label>
                 <GooglePlacesAutocomplete
-                  apiKey="AIzaSyD3P3OPiWaxBOFk6metn9_GYWpGp4VuOUE"
+                  apiKey={process.env.REACT_APP_GMAP_KEY}
                   style={{ position: "absolute" }}
                   selectProps={{
                     location,
                     onChange: setLocation,
                   }}
                 />
-                {/* <Form.Control
-                  type="text"
-                  placeholder="Location"
-                  value={location}
-                  onChange={changeLocation}
-                /> */}
               </Form.Group>
             </Col>
 
