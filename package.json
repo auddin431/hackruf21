@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "dotenv": "^10.0.0",
-    "react-google-places-autocomplete": "^3.3.2"
+    "react-google-places-autocomplete": "^3.3.2",
+    "react-loading": "^2.0.3"
   }
 }
