@@ -42,8 +42,7 @@ function App() {
   const testAPI = async () => {
     try {
       const r = await fetch(
-        `http://192.168.1.135:5000/imagetest`
-        //`http://192.168.1.135:5000/testing?location=${location}&start=${start}&end=${end}`
+        `http://192.168.1.135:5000/testing?Lat=${latitude}&long=${latitude}&start=${start}&end=${end}`
       );
       const response = await r.json();
       setImage1(response.image1);
@@ -82,7 +81,7 @@ function App() {
   const test = () => {
     console.log(location.label);
     getLatLong();
-    //testAPI();
+    testAPI();
     //setShow(1);
   };
 
@@ -102,18 +101,6 @@ function App() {
                     location,
                     onChange: setLocation,
                   }}
-                />
-              </Form.Group>
-            </Col>
-
-            <Col>
-              <Form.Group className="mb-3">
-                <Form.Label>Start Year</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Start Year"
-                  value={start}
-                  onChange={changeStart}
                 />
               </Form.Group>
             </Col>
