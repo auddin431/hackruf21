@@ -8,14 +8,35 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useState } from "react";
 
 function TestComponent(props) {
-  return <h1>{props.text}</h1>;
+  return (
+    <img
+      style={{ maxWidth: "50%", maxHeight: "50%" }}
+      src={`data:image/png;base64, ${props.text}`}
+    />
+  );
 }
 
 function App() {
   const [location, setLocation] = useState("");
   const [show, setShow] = useState(0);
   const [start, setStart] = useState(2021);
+  const [image, setImage] = useState("");
   const [end, setEnd] = useState(2022);
+
+  const testAPI = async () => {
+    try {
+      const r = await fetch(
+        `http://192.168.1.135:5000/imagetest`
+        //`http://192.168.1.135:5000/testing?location=${location}&start=${start}&end=${end}`
+      );
+      const response = await r.json();
+      setImage(response.picture);
+      setShow(1);
+      console.log(response);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const changeLocation = (e) => {
     setLocation(e.target.value);
@@ -34,7 +55,8 @@ function App() {
 
   const test = () => {
     console.log(location);
-    setShow(1);
+    testAPI();
+    //s/etShow(1);
   };
 
   return (
@@ -82,7 +104,7 @@ function App() {
           <Button variant="success" onClick={test}>
             Get Environment Stats
           </Button>
-          {show === 1 && <TestComponent text={location} />}
+          <Row>{show === 1 && <TestComponent text={image} />}</Row>
         </Form>
       </Container>
     </div>
