@@ -7,33 +7,37 @@ import Container from "react-bootstrap/Container";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useState } from "react";
 import { geocodeByAddress, getLatLng } from "react-google-places-autocomplete";
+//import ReactLoading from "react-loading";
+import earth from "./earth-spinning.gif";
 
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 
 function TestComponent(props) {
   return (
     <>
-      {props.text.map((im) => (
-        <div className="imDivItem">
-          <img
-            className="imageComponent"
-            src={`data:image/png;base64, ${im}`}
-          />
-        </div>
-      ))}
-      <h1>
-        Latitude = {props.ello[0]} Longitude = {props.ello[1]}
-      </h1>
+      {props.loading ? (
+        <img src={earth} />
+      ) : (
+        props.text.map((im) => (
+          <div className="imDivItem">
+            <img
+              className="imageComponent"
+              src={`data:image/png;base64, ${im}`}
+            />
+          </div>
+        ))
+      )}
     </>
   );
 }
 
 function App() {
   const [location, setLocation] = useState("");
+  const [loading, setLoading] = useState(false);
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
   const [show, setShow] = useState(0);
-  const [start, setStart] = useState(2021);
+  //const [start, setStart] = useState(2021);
   const [image1, setImage1] = useState("");
   const [image2, setImage2] = useState("");
   //const [image3, setImage3] = useState("");
@@ -42,16 +46,17 @@ function App() {
   const testAPI = async (lll) => {
     try {
       const r1 = await fetch(
-        `http://172.31.2.106:5000/get_precipitation?lat=${lll.lat}&long=${lll.lng}&end=${end}`
+        `http://192.168.1.105:5000/get_sea_coverage?lat=${lll.lat}&long=${lll.lng}&end=${end}`
       );
       const response1 = await r1.json();
       const r2 = await fetch(
-        `http://172.31.2.106:5000/get_air_quality?lat=${lll.lat}&long=${lll.lng}&end=${end}`
+        `http://192.168.1.105:5000/get_temperature?lat=${lll.lat}&long=${lll.lng}&end=${end}`
       );
       const response2 = await r2.json();
 
       setImage1(response1.image);
       setImage2(response2.image);
+      setLoading(false);
       //setImage3(response.image3);
       setShow(1);
       console.log(response1);
@@ -69,12 +74,12 @@ function App() {
   };
 
   function resolveAfter2Seconds(x) {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(x);
-    }, 2000);
-  });
-}
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(x);
+      }, 2000);
+    });
+  }
 
   const changeLocation = (e) => {
     setLocation(e.target.value);
@@ -82,7 +87,7 @@ function App() {
   };
 
   const changeStart = (e) => {
-    setStart(e.target.value);
+    //setStart(e.target.value);
     //console.log(e.target.value);
   };
 
@@ -93,14 +98,16 @@ function App() {
 
   const test = async () => {
     console.log(location.label);
-    var lll = await getLatLong();
+    setShow(1);
+    setLoading(true);
+    const lll = await getLatLong();
     testAPI(lll);
     //setShow(1);
   };
 
   return (
     <div className="App">
-      <h1>Environlife</h1>
+      <h1>EnviroLife</h1>
       <Container>
         <Form>
           <Row>
@@ -140,6 +147,7 @@ function App() {
               <TestComponent
                 ello={[latitude, longitude]}
                 text={[image1, image2]}
+                loading={loading}
               />
             )}
           </div>
